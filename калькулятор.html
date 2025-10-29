@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Калькулятор финансовых потерь</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { 
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .calculator {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            margin: 20px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        .result {
+            background: #e8f5e8;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        .loss {
+            color: #e53935;
+            font-weight: bold;
+        }
+        .profit {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h2>💰 Калькулятор цены отсрочки</h2>
+        
+        <div class="input-group">
+            <label>Ежемесячный взнос (руб):</label>
+            <input type="number" id="payment" value="10000">
+        </div>
+        
+        <div class="input-group">
+            <label>Годовая доходность (%):</label>
+            <input type="number" id="rate" value="10" step="0.1">
+        </div>
+        
+        <div class="input-group">
+            <label>Лет до пенсии:</label>
+            <input type="number" id="years" value="25">
+        </div>
+
+        <div class="result">
+            <h3>📊 Результаты расчета:</h3>
+            <table>
+                <tr>
+                    <th>Сценарий</th>
+                    <th>Капитал к пенсии</th>
+                    <th>Ваши потери</th>
+                </tr>
+                <tr>
+                    <td>✅ Старт СЕЙЧАС</td>
+                    <td id="now" class="profit">0 руб</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>⏳ Старт через 1 год</td>
+                    <td id="year1">0 руб</td>
+                    <td id="loss1" class="loss">0 руб</td>
+                </tr>
+                <tr>
+                    <td>😱 Старт через 5 лет</td>
+                    <td id="year5">0 руб</td>
+                    <td id="loss5" class="loss">0 руб</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            const PMT = parseFloat(document.getElementById('payment').value);
+            const r = parseFloat(document.getElementById('rate').value) / 100;
+            const n = parseInt(document.getElementById('years').value);
+            
+            // Формула будущей стоимости аннуитета
+            const fvNow = PMT * 12 * ((Math.pow(1 + r, n) - 1) / r);
+            const fvYear1 = PMT * 12 * ((Math.pow(1 + r, n-1) - 1) / r);
+            const fvYear5 = PMT * 12 * ((Math.pow(1 + r, n-5) - 1) / r);
+            
+            document.getElementById('now').textContent = formatMoney(fvNow) + ' руб';
+            document.getElementById('year1').textContent = formatMoney(fvYear1) + ' руб';
+            document.getElementById('year5').textContent = formatMoney(fvYear5) + ' руб';
+            document.getElementById('loss1').textContent = formatMoney(fvNow - fvYear1) + ' руб';
+            document.getElementById('loss5').textContent = formatMoney(fvNow - fvYear5) + ' руб';
+        }
+        
+        function formatMoney(amount) {
+            return Math.round(amount).toLocaleString('ru-RU');
+        }
+        
+        // Считаем при загрузке и при любом изменении
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+        
+        // Первый расчет
+        calculate();
+    </script>
+</body>
+</html>
